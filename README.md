@@ -2,6 +2,11 @@
 A Webpack plugin to automatically generate a resources module for MelonJS games
 
 ## Usage
+Install package from NPM repository:
+```bash
+npm i -D melonjs-resources-webpack-plugin
+```
+
 Include in `webpack.config.js` and configure as follows:
 ```js
 // ./webpack.config.js
@@ -10,10 +15,8 @@ const MelonjsResourcesPlugin = require("melonjs-resources-webpack-plugin");
 
 module.exports = {
   // ...
-
   plugins: [
     // ...
-
     new MelonjsResourcesPlugin({
       path: "./src/resources.json", // change as you see fit
       files: [
