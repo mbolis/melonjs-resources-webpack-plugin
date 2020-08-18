@@ -1,6 +1,6 @@
 {
   "name": "melonjs-resources-webpack-plugin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A Webpack plugin to automatically generate a resources module for MelonJS games",
   "main": "index.js",
   "scripts": {

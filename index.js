@@ -48,7 +48,8 @@ class ResourceTree {
   }
 
   match(path) {
-    return this._matchers.find(m => m.matches(path))?.type;
+    const match = this._matchers.find(m => m.matches(path));
+    return match && match.type;
   }
 
   offer(path) {
