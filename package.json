@@ -20,7 +20,7 @@
     "url": "https://github.com/mbolis/melonjs-resources-webpack-plugin/issues"
   },
   "homepage": "https://github.com/mbolis/melonjs-resources-webpack-plugin#readme",
-  "devDependencies": {
+  "dependencies": {
     "chokidar": "^3.4.2",
     "glob": "^7.1.6",
     "webpack-virtual-modules": "^0.2.2"
