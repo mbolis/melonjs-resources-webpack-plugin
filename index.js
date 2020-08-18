@@ -6,8 +6,8 @@ const path = require("path");
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 
 class ResourceMatcher {
-  constructor({src, type}) {
-    const g = new GlobSync(src);
+  constructor(cwd, {src, type}) {
+    const g = new GlobSync(src, {cwd});
     this._matcher = g.minimatch;
     this.found = g.found;
     this.type = type;
@@ -19,11 +19,11 @@ class ResourceMatcher {
 }
 
 class ResourceTree {
-  constructor(files) {
+  constructor(cwd, files) {
     this._matchers = [];
     this.found = [];
     for (let file of files) {
-      const m = new ResourceMatcher(file);
+      const m = new ResourceMatcher(path.resolve(cwd), file);
       this._matchers.push(m);
       for (let found of m.found) {
         this.found.push([found, m.type]);
@@ -109,12 +109,13 @@ function cssSafe(string) {
 }
 
 module.exports = class ResourceTreePlugin extends VirtualModulesPlugin {
-  constructor({path, files}) {
+  constructor({path, files, cwd="."}) {
     if (!/\.json$/.test(path)) throw new Error("Only JSON path supported by ResourceTree plugin.");
     super();
 
     this._path = path;
     this._files = files.flatMap(f => f.src.map(src => ({src, type: f.type})));
+    this._cwd = cwd;
   }
 
   apply(compiler) {
@@ -132,12 +133,13 @@ module.exports = class ResourceTreePlugin extends VirtualModulesPlugin {
   _buildTree() {
     if (this._ready) return;
 
-    const tree = new ResourceTree(this._files);
+    const tree = new ResourceTree(this._cwd, this._files);
     super.writeModule(this._path, tree.source);
 
     if (this._watching) {
       const chokidar = require("chokidar");
       
+      const cwd = this._cwd;
       const baseDirs = tree.found
         .map(f => path.relative(".", f[0]).split(path.sep)[0])
         .reduce((baseDirs, dir) => {
@@ -145,11 +147,11 @@ module.exports = class ResourceTreePlugin extends VirtualModulesPlugin {
           return baseDirs;
         }, []);
 
-      chokidar.watch(baseDirs).on("change", resource =>
+      chokidar.watch(baseDirs, {cwd}).on("change", resource =>
         tree.match(resource) && super.writeModule(this._path, tree.source));
-      chokidar.watch(baseDirs).on("add", resource =>
+      chokidar.watch(baseDirs, {cwd}).on("add", resource =>
         tree.offer(resource) && super.writeModule(this._path, tree.source));
-      chokidar.watch(baseDirs).on("unlink", resource =>
+      chokidar.watch(baseDirs, {cwd}).on("unlink", resource =>
         tree.remove(resource) && super.writeModule(this._path, tree.source));
     }
 

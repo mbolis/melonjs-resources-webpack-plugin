@@ -19,6 +19,7 @@ module.exports = {
     // ...
     new MelonjsResourcesPlugin({
       path: "./src/resources.json", // change as you see fit
+      cwd: "./public",            // optional
       files: [
         {
           src: ["data/@(bgm|sfx|audio)/**/*"],
@@ -58,6 +59,9 @@ The resources file will be added as a virtual module (not written to disk) and a
 The specified file should not exist, otherwise it will be overwritten (TODO: merge existing files).
 
 **Note** that `path`'s extension must be `.json`.
+
+Files will be searched following the provided [glob](https://www.npmjs.com/package/glob#glob-primer) expressions, starting from `cwd` (default: `"."`).  
+Note that `cwd` will not be present in the generated URLs.
 
 Using the previous example configuration, you can import the resources into your game like this:
 
